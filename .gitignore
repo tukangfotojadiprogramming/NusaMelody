@@ -1,0 +1,9 @@
+# .gitignore
+/bin/
+/target/
+/out/
+.vscode/
+.idea/
+*.class
+*.log
+.DS_Store
