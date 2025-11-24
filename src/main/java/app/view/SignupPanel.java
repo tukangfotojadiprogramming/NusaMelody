@@ -33,20 +33,25 @@ public class SignupPanel extends JPanel {
         setBackground(BG_OUTER);
         setOpaque(true);
 
-        // Rounded card with GridBagLayout to match LoginPanel structure
+        // Rounded card
         RoundedPanel card = new RoundedPanel(14);
         card.setBackground(CARD_BG);
-        card.setPreferredSize(new Dimension(440, 620));
-        card.setMaximumSize(new Dimension(440, 620));
-        card.setBorder(BorderFactory.createEmptyBorder(16, 26, 16, 26));
+        card.setPreferredSize(new Dimension(440, 650)); // Sedikit dipertinggi agar muat
+        card.setMaximumSize(new Dimension(440, 650));
+        card.setBorder(BorderFactory.createEmptyBorder(20, 30, 20, 30));
         card.setLayout(new GridBagLayout());
 
         GridBagConstraints c = new GridBagConstraints();
         c.gridx = 0;
         c.gridwidth = 1;
-        c.fill = GridBagConstraints.NONE;
+        
+        // --- PERBAIKAN UTAMA DI SINI ---
+        // Mengubah fill menjadi HORIZONTAL agar komponen melebar penuh
+        c.fill = GridBagConstraints.HORIZONTAL; 
+        // -------------------------------
+        
         c.anchor = GridBagConstraints.CENTER;
-        c.weightx = 1.0;
+        c.weightx = 1.0; // Memberi bobot agar kolom melebar
 
         // Row 0: icon
         JLabel icon = new JLabel("\u266B");
@@ -58,28 +63,24 @@ public class SignupPanel extends JPanel {
         card.add(icon, c);
 
         // Row 1: title
-        JLabel lblTitle = new JLabel("Daftar Akun Baru");
+        JLabel lblTitle = new JLabel("Daftar Akun Baru", SwingConstants.CENTER);
         lblTitle.setFont(new Font("SansSerif", Font.BOLD, 20));
         lblTitle.setForeground(new Color(45, 40, 37));
-        lblTitle.setHorizontalAlignment(SwingConstants.CENTER);
         c.gridy = 1;
         c.insets = new Insets(2, 0, 4, 0);
         card.add(lblTitle, c);
 
         // Row 2: subtitle
-        JLabel lblSub = new JLabel("Buat akun untuk mulai bermain Kuis Lirik Nusantara");
+        JLabel lblSub = new JLabel("<html><div style='text-align:center;'>Buat akun untuk mulai bermain<br>Kuis Lirik Nusantara</div></html>", SwingConstants.CENTER);
         lblSub.setFont(new Font("SansSerif", Font.PLAIN, 12));
         lblSub.setForeground(new Color(125, 112, 103));
-        lblSub.setHorizontalAlignment(SwingConstants.CENTER);
         c.gridy = 2;
-        c.insets = new Insets(0, 8, 12, 8);
+        c.insets = new Insets(0, 8, 15, 8);
         card.add(lblSub, c);
 
         // Row 3: label Name
         JLabel lblName = new JLabel("Nama Lengkap");
         lblName.setFont(new Font("SansSerif", Font.BOLD, 13));
-        lblName.setHorizontalAlignment(SwingConstants.LEFT);
-        lblName.setPreferredSize(new Dimension(INPUT_SIZE.width, 18));
         c.gridy = 3;
         c.insets = new Insets(2, 0, 4, 0);
         card.add(lblName, c);
@@ -87,7 +88,6 @@ public class SignupPanel extends JPanel {
         // Row 4: Name field
         txtName = new JTextField();
         txtName.setPreferredSize(INPUT_SIZE);
-        txtName.setMaximumSize(INPUT_SIZE);
         txtName.setFont(new Font("SansSerif", Font.PLAIN, 14));
         txtName.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createLineBorder(INPUT_BORDER, 1),
@@ -95,14 +95,12 @@ public class SignupPanel extends JPanel {
         ));
         setPlaceholder(txtName, "Masukkan nama lengkap");
         c.gridy = 4;
-        c.insets = new Insets(2, 0, 8, 0);
+        c.insets = new Insets(2, 0, 10, 0);
         card.add(txtName, c);
 
         // Row 5: label Email
         JLabel lblEmail = new JLabel("Email");
         lblEmail.setFont(new Font("SansSerif", Font.BOLD, 13));
-        lblEmail.setHorizontalAlignment(SwingConstants.LEFT);
-        lblEmail.setPreferredSize(new Dimension(INPUT_SIZE.width, 18));
         c.gridy = 5;
         c.insets = new Insets(2, 0, 4, 0);
         card.add(lblEmail, c);
@@ -110,7 +108,6 @@ public class SignupPanel extends JPanel {
         // Row 6: Email field
         txtEmail = new JTextField();
         txtEmail.setPreferredSize(INPUT_SIZE);
-        txtEmail.setMaximumSize(INPUT_SIZE);
         txtEmail.setFont(new Font("SansSerif", Font.PLAIN, 14));
         txtEmail.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createLineBorder(INPUT_BORDER, 1),
@@ -118,14 +115,12 @@ public class SignupPanel extends JPanel {
         ));
         setPlaceholder(txtEmail, "anda@contoh.com");
         c.gridy = 6;
-        c.insets = new Insets(2, 0, 8, 0);
+        c.insets = new Insets(2, 0, 10, 0);
         card.add(txtEmail, c);
 
         // Row 7: label Password
         JLabel lblPass = new JLabel("Kata Sandi");
         lblPass.setFont(new Font("SansSerif", Font.BOLD, 13));
-        lblPass.setHorizontalAlignment(SwingConstants.LEFT);
-        lblPass.setPreferredSize(new Dimension(INPUT_SIZE.width, 18));
         c.gridy = 7;
         c.insets = new Insets(2, 0, 4, 0);
         card.add(lblPass, c);
@@ -133,7 +128,6 @@ public class SignupPanel extends JPanel {
         // Row 8: password wrapper + eye
         JPanel passWrapper = new JPanel(new BorderLayout());
         passWrapper.setPreferredSize(INPUT_SIZE);
-        passWrapper.setMaximumSize(INPUT_SIZE);
         passWrapper.setBorder(BorderFactory.createLineBorder(INPUT_BORDER, 1));
         passWrapper.setBackground(CARD_BG);
 
@@ -159,8 +153,6 @@ public class SignupPanel extends JPanel {
         // Row 9: label Confirm Password
         JLabel lblConfirm = new JLabel("Konfirmasi Kata Sandi");
         lblConfirm.setFont(new Font("SansSerif", Font.BOLD, 13));
-        lblConfirm.setHorizontalAlignment(SwingConstants.LEFT);
-        lblConfirm.setPreferredSize(new Dimension(INPUT_SIZE.width, 18));
         c.gridy = 9;
         c.insets = new Insets(2, 0, 4, 0);
         card.add(lblConfirm, c);
@@ -168,7 +160,6 @@ public class SignupPanel extends JPanel {
         // Row 10: confirm pass wrapper + eye
         JPanel confirmWrapper = new JPanel(new BorderLayout());
         confirmWrapper.setPreferredSize(INPUT_SIZE);
-        confirmWrapper.setMaximumSize(INPUT_SIZE);
         confirmWrapper.setBorder(BorderFactory.createLineBorder(INPUT_BORDER, 1));
         confirmWrapper.setBackground(CARD_BG);
 
@@ -188,13 +179,12 @@ public class SignupPanel extends JPanel {
         confirmWrapper.add(btnShowConfirmPass, BorderLayout.EAST);
 
         c.gridy = 10;
-        c.insets = new Insets(2, 0, 12, 0);
+        c.insets = new Insets(2, 0, 20, 0); // Gap lebih besar sebelum tombol
         card.add(confirmWrapper, c);
 
         // Row 11: Signup button
         btnSignup = new JButton("Daftar");
         btnSignup.setPreferredSize(new Dimension(360, 44));
-        btnSignup.setMaximumSize(new Dimension(360, 44));
         btnSignup.setFont(new Font("SansSerif", Font.BOLD, 15));
         btnSignup.setForeground(Color.WHITE);
         btnSignup.setBackground(PRIMARY);
@@ -206,28 +196,31 @@ public class SignupPanel extends JPanel {
             @Override public void mouseExited(MouseEvent e) { btnSignup.setBackground(PRIMARY); }
         });
         c.gridy = 11;
-        c.insets = new Insets(6, 0, 6, 0);
+        c.insets = new Insets(0, 0, 10, 0);
         card.add(btnSignup, c);
 
         // Row 12: back to login link
-        JLabel backToLogin = new JLabel("<html><span style='font-size:12px'>Sudah punya akun? <a href='#'>Masuk di sini</a></span></html>");
+        JLabel backToLogin = new JLabel("<html><span style='font-size:12px'>Sudah punya akun? <a href='#'>Masuk di sini</a></span></html>", SwingConstants.CENTER);
         backToLogin.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         c.gridy = 12;
-        c.insets = new Insets(6, 0, 6, 0);
+        c.insets = new Insets(0, 0, 5, 0);
         card.add(backToLogin, c);
 
         // Disclaimer outside card
-        JLabel disclaimer = new JLabel("<html><div style='text-align:center;font-size:11px;color:#7d7067'>Dengan mendaftar, Anda menyetujui Syarat dan Kebijakan Privasi kami</div></html>");
+        JLabel disclaimer = new JLabel("<html><div style='text-align:center;font-size:11px;color:#7d7067'>Dengan mendaftar, Anda menyetujui<br>Syarat dan Kebijakan Privasi kami</div></html>");
         disclaimer.setHorizontalAlignment(SwingConstants.CENTER);
 
         // Add card + disclaimer to main panel
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0; gbc.gridy = 0;
         gbc.anchor = GridBagConstraints.CENTER;
-        gbc.weightx = 1.0; gbc.weighty = 0.9;
+        gbc.weightx = 1.0; 
+        gbc.weighty = 1.0;
         add(card, gbc);
 
-        gbc.gridy = 1; gbc.weighty = 0.0; gbc.insets = new Insets(10, 0, 8, 0);
+        gbc.gridy = 1; 
+        gbc.weighty = 0.0; 
+        gbc.insets = new Insets(10, 0, 15, 0);
         add(disclaimer, gbc);
 
         // invisible back to login proxy
@@ -270,7 +263,7 @@ public class SignupPanel extends JPanel {
                     try (PreparedStatement ps = c.prepareStatement(sql)) {
                         ps.setString(1, name);
                         ps.setString(2, email.toLowerCase().trim());
-                        ps.setString(3, pass); // plain password stored per request
+                        ps.setString(3, pass); 
                         ps.setString(4, "Newbie");
                         ps.executeUpdate();
                         return true;
