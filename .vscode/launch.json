@@ -9,6 +9,13 @@
             "name": "Main",
             "request": "launch",
             "mainClass": "main.java.app.Main",
+            "projectName": "NusaMelody_97e2dad6"
+        },
+        {
+            "type": "java",
+            "name": "Main",
+            "request": "launch",
+            "mainClass": "main.java.app.Main",
             "projectName": "NusaMelody_7b0aa44"
         },
         {
