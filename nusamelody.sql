@@ -13,10 +13,12 @@ CREATE TABLE IF NOT EXISTS songs (
     thumbnail VARCHAR(255)
 );
 
--- Tabel 2: Users
+-- Tabel 2: Users (ditambahkan kolom email dan password untuk mendukung login)
 CREATE TABLE IF NOT EXISTS users (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(100),
+    email VARCHAR(100) UNIQUE NOT NULL,  -- Kolom email unik untuk login
+    password VARCHAR(255) NOT NULL,       -- Kolom password (disarankan hash di aplikasi)
     points INT DEFAULT 0,
     badges TEXT
 );
@@ -32,8 +34,9 @@ CREATE TABLE IF NOT EXISTS user_progress (
     FOREIGN KEY (song_id) REFERENCES songs(id)
 );
 
--- SEED DATA (DUMMY)
-INSERT INTO users (name, points, badges) VALUES ('Siswa Teladan', 0, 'Newbie');
+-- SEED DATA (DUMMY) - Ditambahkan email dan password untuk demo login
+INSERT INTO users (name, email, password, points, badges) VALUES 
+('Siswa Teladan', 'demo@test.com', 'apapun', 0, 'Newbie');  -- Password plain text untuk demo, sebaiknya hash di aplikasi
 
 INSERT INTO songs (title, province, audio_path, lyrics, translation, cultural_values, thumbnail) 
 VALUES 

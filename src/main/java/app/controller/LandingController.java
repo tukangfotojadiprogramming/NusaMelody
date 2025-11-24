@@ -1,8 +1,8 @@
 package main.java.app.controller;
 
-import main.java.app.view.LandingPage;
 import java.awt.CardLayout;
 import javax.swing.JPanel;
+import main.java.app.view.LandingPage;
 
 public class LandingController {
     public LandingController(LandingPage view, JPanel mainContainer, CardLayout cardLayout) {

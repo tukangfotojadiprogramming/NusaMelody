@@ -1,8 +1,8 @@
 package main.java.app.util;
 
+import java.awt.*;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
-import java.awt.*;
 
 public class UIStyle {
     // Palet Warna Nusantara
@@ -10,6 +10,8 @@ public class UIStyle {
     public static final Color COLOR_ACCENT = Color.decode("#D2691E");  // Chocolate
     public static final Color COLOR_BG = Color.decode("#F5F5DC");      // Beige (Krem)
     public static final Color COLOR_TEXT = Color.decode("#3E2723");    // Dark Brown
+    public static final Color COLOR_TEXT_DARK = new Color(30, 30, 30); // warna gelap
+
 
     public static void applyModernButton(JButton btn) {
         btn.setBackground(COLOR_PRIMARY);
