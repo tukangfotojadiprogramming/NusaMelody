@@ -14,102 +14,100 @@ public class LandingPage extends JPanel {
     public LandingPage() {
         setLayout(new BorderLayout());
         
-        // Panel Konten Utama (Vertical Stack)
-        JPanel mainContent = new JPanel();
-        mainContent.setLayout(new BoxLayout(mainContent, BoxLayout.Y_AXIS));
-        mainContent.setBackground(Color.WHITE);
+        // Gunakan Background Panel Custom
+        JPanel mainPanel = UIStyle.createBackgroundPanel();
+        
+        // 1. HEADER LOGO
+        JLabel lblHero = new JLabel("NusaMelody", SwingConstants.CENTER);
+        lblHero.setFont(new Font("Serif", Font.BOLD, 64));
+        lblHero.setForeground(Color.WHITE);
+        lblHero.setBorder(new EmptyBorder(50, 0, 10, 0));
 
-        // 1. HERO SECTION
-        JPanel heroPanel = new JPanel() {
+        JLabel lblSub = new JLabel("Jelajahi Kekayaan Musik Nusantara dalam Satu Genggaman", SwingConstants.CENTER);
+        lblSub.setFont(new Font("SansSerif", Font.PLAIN, 18));
+        lblSub.setForeground(new Color(255, 215, 0)); // Emas
+
+        JPanel topBox = new JPanel();
+        topBox.setLayout(new BoxLayout(topBox, BoxLayout.Y_AXIS));
+        topBox.setOpaque(false);
+        lblHero.setAlignmentX(Component.CENTER_ALIGNMENT);
+        lblSub.setAlignmentX(Component.CENTER_ALIGNMENT);
+        topBox.add(lblHero);
+        topBox.add(lblSub);
+
+        // 2. MENU CARDS (Grid 3 Kolom)
+        JPanel cardsPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 30, 30));
+        cardsPanel.setOpaque(false);
+        
+        cardsPanel.add(createMenuCard("Jelajah Peta", "Temukan lagu berdasarkan provinsi.", "icon-map.png", "PROVINCE"));
+        cardsPanel.add(createMenuCard("Katalog Lengkap", "Daftar seluruh lagu daerah A-Z.", "icon-book.png", "CATALOG"));
+        cardsPanel.add(createMenuCard("Kuis Interaktif", "Uji pengetahuan musikmu.", "icon-quiz.png", "QUIZ"));
+
+        mainPanel.add(topBox, BorderLayout.NORTH);
+        mainPanel.add(cardsPanel, BorderLayout.CENTER);
+        
+        add(mainPanel, BorderLayout.CENTER);
+    }
+
+    private JPanel createMenuCard(String title, String desc, String iconName, String actionKey) {
+        // Kartu dengan background kertas
+        JPanel card = new JPanel(new BorderLayout()) {
             @Override
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
-                ImageIcon icon = AssetLoader.loadImage("landing-hero.jpg");
-                if (icon != null) {
-                    g.drawImage(icon.getImage(), 0, 0, getWidth(), getHeight(), this);
-                    g.setColor(new Color(0, 0, 0, 120)); // Overlay Gelap
-                    g.fillRect(0, 0, getWidth(), getHeight());
+                Graphics2D g2 = (Graphics2D) g;
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                
+                ImageIcon paper = AssetLoader.loadImage("paper-texture.png");
+                if(paper != null) {
+                    g.drawImage(paper.getImage(), 0, 0, getWidth(), getHeight(), null);
                 } else {
-                    g.setColor(UIStyle.COLOR_PRIMARY);
-                    g.fillRect(0, 0, getWidth(), getHeight());
+                    g.setColor(new Color(255, 248, 220)); // Cream fallback
+                    g.fillRect(0,0,getWidth(),getHeight());
                 }
+                
+                // Border kayu manual (Sekarang menggunakan g2, bukan g)
+                g2.setColor(new Color(101, 67, 33));
+                g2.setStroke(new BasicStroke(5)); // TEBAL GARIS
+                g2.drawRect(0,0,getWidth(),getHeight());
             }
         };
-        heroPanel.setPreferredSize(new Dimension(1200, 400));
-        heroPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 400));
-        heroPanel.setLayout(new BoxLayout(heroPanel, BoxLayout.Y_AXIS));
-        heroPanel.setBorder(new EmptyBorder(100, 0, 0, 0));
-
-        JLabel title = new JLabel("NusaMelody");
-        title.setFont(new Font("Serif", Font.BOLD, 72));
-        title.setForeground(Color.WHITE);
-        title.setAlignmentX(Component.CENTER_ALIGNMENT);
-
-        JLabel subtitle = new JLabel("Jelajahi Kekayaan Musik Nusantara dalam Satu Genggaman");
-        subtitle.setFont(new Font("SansSerif", Font.PLAIN, 24));
-        subtitle.setForeground(Color.WHITE);
-        subtitle.setAlignmentX(Component.CENTER_ALIGNMENT);
-
-        heroPanel.add(title);
-        heroPanel.add(Box.createRigidArea(new Dimension(0, 20)));
-        heroPanel.add(subtitle);
-
-        // 2. FEATURES SECTION (GRID)
-        JPanel featuresPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 40, 40));
-        featuresPanel.setBackground(Color.WHITE);
-        
-        featuresPanel.add(createFeatureCard("Jelajah Peta", "Temukan lagu berdasarkan provinsi asal.", "PROVINCE"));
-        featuresPanel.add(createFeatureCard("Katalog Lengkap", "Daftar seluruh lagu daerah A-Z.", "CATALOG"));
-        featuresPanel.add(createFeatureCard("Kuis Interaktif", "Uji pengetahuan musikmu.", "QUIZ"));
-
-        // 3. FOOTER
-        JPanel footer = new JPanel();
-        footer.setBackground(UIStyle.COLOR_SIDEBAR);
-        footer.setPreferredSize(new Dimension(1200, 80));
-        JLabel copy = new JLabel("© 2024 NusaMelody Team - PBO Project");
-        copy.setForeground(Color.LIGHT_GRAY);
-        footer.add(copy);
-
-        mainContent.add(heroPanel);
-        mainContent.add(featuresPanel);
-        mainContent.add(Box.createVerticalGlue());
-        mainContent.add(footer);
-
-        // Bungkus dengan ScrollPane
-        JScrollPane scroll = new JScrollPane(mainContent);
-        scroll.setBorder(null);
-        scroll.getVerticalScrollBar().setUnitIncrement(16);
-        add(scroll, BorderLayout.CENTER);
-    }
-
-    private JPanel createFeatureCard(String title, String desc, String actionKey) {
-        JPanel card = new JPanel();
-        card.setLayout(new BoxLayout(card, BoxLayout.Y_AXIS));
-        card.setPreferredSize(new Dimension(250, 200));
-        card.setBackground(UIStyle.COLOR_BG);
+        card.setPreferredSize(new Dimension(280, 320));
         card.setBorder(new EmptyBorder(20, 20, 20, 20));
-
-        JLabel lblTitle = new JLabel(title);
-        lblTitle.setFont(new Font("SansSerif", Font.BOLD, 18));
-        lblTitle.setForeground(UIStyle.COLOR_PRIMARY);
-        lblTitle.setAlignmentX(Component.CENTER_ALIGNMENT);
-
-        JLabel lblDesc = new JLabel("<html><center>" + desc + "</center></html>");
-        lblDesc.setAlignmentX(Component.CENTER_ALIGNMENT);
-
-        JButton btn = new JButton("Buka");
-        UIStyle.applyModernButton(btn);
-        btn.setAlignmentX(Component.CENTER_ALIGNMENT);
-        btn.addActionListener(e -> {
-            if (navActions.containsKey(actionKey)) navActions.get(actionKey).run();
+        
+        // Icon
+        JLabel lblIcon = new JLabel();
+        ImageIcon ic = AssetLoader.loadImage(iconName);
+        if(ic != null) lblIcon.setIcon(new ImageIcon(ic.getImage().getScaledInstance(80, 80, Image.SCALE_SMOOTH)));
+        lblIcon.setHorizontalAlignment(SwingConstants.CENTER);
+        
+        // Text
+        JLabel lblTitle = new JLabel(title, SwingConstants.CENTER);
+        lblTitle.setFont(new Font("Serif", Font.BOLD, 22));
+        lblTitle.setForeground(new Color(139, 69, 19)); // Cokelat text
+        
+        JTextArea txtDesc = new JTextArea(desc);
+        txtDesc.setWrapStyleWord(true);
+        txtDesc.setLineWrap(true);
+        txtDesc.setOpaque(false);
+        txtDesc.setEditable(false);
+        txtDesc.setFont(new Font("SansSerif", Font.PLAIN, 14));
+        txtDesc.setForeground(Color.DARK_GRAY);
+        
+        // Button Kayu
+        JButton btnOpen = UIStyle.createWoodenButton("Buka");
+        btnOpen.addActionListener(e -> {
+            if(navActions.containsKey(actionKey)) navActions.get(actionKey).run();
         });
 
-        card.add(lblTitle);
-        card.add(Box.createRigidArea(new Dimension(0, 10)));
-        card.add(lblDesc);
-        card.add(Box.createRigidArea(new Dimension(0, 20)));
-        card.add(btn);
+        JPanel center = new JPanel(new GridLayout(3, 1, 0, 5));
+        center.setOpaque(false);
+        center.add(lblIcon);
+        center.add(lblTitle);
+        center.add(txtDesc);
 
+        card.add(center, BorderLayout.CENTER);
+        card.add(btnOpen, BorderLayout.SOUTH);
         return card;
     }
 

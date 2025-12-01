@@ -1,21 +1,21 @@
 package main.java.app.view;
 
+import main.java.app.util.AssetLoader;
 import main.java.app.util.UIStyle;
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import java.awt.*;
 
 public class QuizPage extends JPanel {
     private CardLayout layout;
     private JPanel mainPanel; 
-    private JPanel gamePanel; 
     
+    // Components
     private JLabel lblTimer, lblQuestionNo, lblStatus;
     private JButton[] btnOptions;
     private JButton btnReplay;
-    private JButton btnLeaderboard; 
+    private JButton btnStart, btnLeaderboard, btnBack; // Menu buttons
     private JLabel countdownLabel;
-    
-    // Panel Leaderboard external
     private JPanel leaderboardPanelContainer; 
 
     public QuizPage() {
@@ -23,106 +23,130 @@ public class QuizPage extends JPanel {
         layout = new CardLayout();
         mainPanel = new JPanel(layout);
         
-        // 1. MENU VIEW
-        JPanel menuView = new JPanel(new GridBagLayout());
-        menuView.setBackground(UIStyle.COLOR_BG);
-        JButton btnStart = new JButton("MULAI MAIN");
-        btnLeaderboard = new JButton("LEADERBOARD"); 
+        // --- 1. MENU VIEW (Wayang Style) ---
+        JPanel menuView = UIStyle.createBackgroundPanel();
+        menuView.setLayout(new BorderLayout());
         
-        UIStyle.applyModernButton(btnStart);
-        UIStyle.applyModernButton(btnLeaderboard);
-        
-        JPanel menuBox = new JPanel(new GridLayout(2, 1, 10, 10));
-        menuBox.setOpaque(false);
-        menuBox.add(btnStart);
-        menuBox.add(btnLeaderboard);
-        menuView.add(menuBox);
+        // Header
+        btnBack = UIStyle.createWoodenButton("Kembali");
+        btnBack.setPreferredSize(new Dimension(120, 40));
+        menuView.add(UIStyle.createHeader("", btnBack), BorderLayout.NORTH);
 
-        // 2. GAME VIEW
-        gamePanel = new JPanel(new BorderLayout());
-        gamePanel.setBackground(Color.WHITE);
+        // Center (Judul & Tombol)
+        JPanel centerMenu = new JPanel(new GridBagLayout());
+        centerMenu.setOpaque(false);
         
-        JPanel topPanel = new JPanel(new BorderLayout());
-        topPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
-        topPanel.setBackground(UIStyle.COLOR_SIDEBAR);
+        JLabel title = new JLabel("<html><center>Kuis Musik<br>Nusantara</center></html>", SwingConstants.CENTER);
+        title.setFont(new Font("Serif", Font.BOLD, 48));
+        title.setForeground(UIStyle.COLOR_GOLD);
         
-        lblTimer = new JLabel("Waktu: 60s");
-        lblTimer.setFont(new Font("Monospaced", Font.BOLD, 24));
-        lblTimer.setForeground(Color.GREEN);
+        btnStart = UIStyle.createWoodenButton("MULAI MAIN");
+        btnStart.setPreferredSize(new Dimension(300, 60));
         
-        lblQuestionNo = new JLabel("Soal 1/10");
+        btnLeaderboard = UIStyle.createWoodenButton("LEADERBOARD");
+        btnLeaderboard.setPreferredSize(new Dimension(300, 60));
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx=0; gbc.gridy=0; gbc.insets=new Insets(0,0,30,0);
+        centerMenu.add(title, gbc);
+        gbc.gridy=1; gbc.insets=new Insets(0,0,15,0);
+        centerMenu.add(btnStart, gbc);
+        gbc.gridy=2;
+        centerMenu.add(btnLeaderboard, gbc);
+        
+        menuView.add(centerMenu, BorderLayout.CENTER);
+
+        // Ornamen Wayang (Kiri & Kanan)
+        JLabel wayangLeft = new JLabel(AssetLoader.loadImage("wayang-left.png"));
+        JLabel wayangRight = new JLabel(AssetLoader.loadImage("wayang-right.png"));
+        menuView.add(wayangLeft, BorderLayout.WEST);
+        menuView.add(wayangRight, BorderLayout.EAST);
+
+
+        // --- 2. GAME VIEW (Gameplay) ---
+        JPanel gameView = UIStyle.createBackgroundPanel();
+        gameView.setLayout(new BorderLayout());
+        
+        // Top: Timer & Info
+        JPanel topBar = new JPanel(new BorderLayout());
+        topBar.setOpaque(false);
+        topBar.setBorder(new EmptyBorder(20, 30, 10, 30));
+        
+        lblTimer = new JLabel("Sisa Waktu: 60s");
+        lblTimer.setFont(new Font("Serif", Font.BOLD, 28));
+        lblTimer.setForeground(UIStyle.COLOR_GOLD);
+        
+        lblQuestionNo = new JLabel("Soal: 1/10");
+        UIStyle.createWoodenButton("Soal 1"); // Dummy style
         lblQuestionNo.setForeground(Color.WHITE);
+        lblQuestionNo.setFont(new Font("SansSerif", Font.BOLD, 16));
         
-        topPanel.add(lblTimer, BorderLayout.WEST);
-        topPanel.add(lblQuestionNo, BorderLayout.EAST);
+        topBar.add(lblTimer, BorderLayout.WEST);
+        topBar.add(lblQuestionNo, BorderLayout.EAST);
+        gameView.add(topBar, BorderLayout.NORTH);
+
+        // Center: Status & Replay
+        JPanel centerGame = new JPanel(new GridBagLayout());
+        centerGame.setOpaque(false);
         
-        JPanel centerPanel = new JPanel(new GridLayout(2, 1));
-        centerPanel.setOpaque(false);
-        lblStatus = new JLabel("Dengarkan lagunya...", SwingConstants.CENTER);
+        lblStatus = new JLabel("Mendengarkan...", SwingConstants.CENTER);
         lblStatus.setFont(new Font("Serif", Font.ITALIC, 24));
+        lblStatus.setForeground(new Color(255, 248, 220)); // Krem
         
-        btnReplay = new JButton("Putar Ulang (5s)");
-        UIStyle.applyModernButton(btnReplay);
-        btnReplay.setBackground(Color.GRAY);
+        btnReplay = UIStyle.createWoodenButton("Putar Ulang (5s)");
+        btnReplay.setPreferredSize(new Dimension(200, 45));
         btnReplay.setEnabled(false);
-        JPanel btnPanel = new JPanel(); btnPanel.setOpaque(false); btnPanel.add(btnReplay);
+        
+        gbc.gridy=0; centerGame.add(lblStatus, gbc);
+        gbc.gridy=1; centerGame.add(btnReplay, gbc);
+        gameView.add(centerGame, BorderLayout.CENTER);
 
-        centerPanel.add(lblStatus);
-        centerPanel.add(btnPanel);
-
-        JPanel optionsPanel = new JPanel(new GridLayout(2, 2, 10, 10));
-        optionsPanel.setBorder(BorderFactory.createEmptyBorder(20, 50, 50, 50));
+        // Bottom: Pilihan Jawaban (Tombol Kayu Panjang)
+        JPanel optionsPanel = new JPanel(new GridLayout(2, 2, 20, 15));
+        optionsPanel.setOpaque(false);
+        optionsPanel.setBorder(new EmptyBorder(20, 80, 50, 80));
+        
         btnOptions = new JButton[4];
         for(int i=0; i<4; i++) {
-            btnOptions[i] = new JButton();
-            UIStyle.applyModernButton(btnOptions[i]);
+            btnOptions[i] = UIStyle.createWoodenButton("Pilihan " + (i+1));
             optionsPanel.add(btnOptions[i]);
         }
+        gameView.add(optionsPanel, BorderLayout.SOUTH);
 
-        gamePanel.add(topPanel, BorderLayout.NORTH);
-        gamePanel.add(centerPanel, BorderLayout.CENTER);
-        gamePanel.add(optionsPanel, BorderLayout.SOUTH);
-
-        // 3. COUNTDOWN
+        // --- 3. OTHER LAYERS ---
         countdownLabel = new JLabel("", SwingConstants.CENTER);
         countdownLabel.setFont(new Font("Serif", Font.BOLD, 150));
-        countdownLabel.setForeground(UIStyle.COLOR_PRIMARY);
-
-        // 4. LEADERBOARD CONTAINER
+        countdownLabel.setForeground(UIStyle.COLOR_GOLD);
+        
         leaderboardPanelContainer = new JPanel(new BorderLayout());
 
         mainPanel.add(menuView, "MENU");
-        mainPanel.add(gamePanel, "GAME");
+        mainPanel.add(gameView, "GAME");
         mainPanel.add(countdownLabel, "COUNTDOWN");
         mainPanel.add(leaderboardPanelContainer, "LEADERBOARD");
 
         add(mainPanel, BorderLayout.CENTER);
     }
 
-    public void setLeaderboardView(JPanel view) {
-        leaderboardPanelContainer.add(view, BorderLayout.CENTER);
-    }
-
+    // Getters & Helpers (Sama seperti sebelumnya, sesuaikan tombol)
+    public void setLeaderboardView(JPanel view) { leaderboardPanelContainer.add(view, BorderLayout.CENTER); }
     public void showMenu() { layout.show(mainPanel, "MENU"); }
     public void showGame() { layout.show(mainPanel, "GAME"); }
-    public void showCountdown(String text) { 
-        countdownLabel.setText(text);
-        layout.show(mainPanel, "COUNTDOWN");
-    }
+    public void showCountdown(String text) { countdownLabel.setText(text); layout.show(mainPanel, "COUNTDOWN"); }
     public void showLeaderboardPanel() { layout.show(mainPanel, "LEADERBOARD"); }
     
     public void updateGameInfo(int qIndex, int timeLeft) {
         lblQuestionNo.setText("Soal: " + (qIndex+1) + "/10");
         lblTimer.setText("Sisa Waktu: " + timeLeft + "s");
     }
-
     public void setStatus(String text) { lblStatus.setText(text); }
     public void setOptions(String[] titles) {
         for(int i=0; i<4; i++) btnOptions[i].setText(titles[i]);
     }
     
-    public JButton getStartButton() { return (JButton) ((JPanel)((JPanel)mainPanel.getComponent(0)).getComponent(0)).getComponent(0); }
+    public JButton getStartButton() { return btnStart; }
     public JButton getBtnLeaderboard() { return btnLeaderboard; }
     public JButton getReplayButton() { return btnReplay; }
     public JButton getOptionButton(int index) { return btnOptions[index]; }
+    public JButton getBtnBack() { return btnBack; } // Button kembali di menu utama kuis
 }

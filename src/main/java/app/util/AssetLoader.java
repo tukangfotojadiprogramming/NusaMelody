@@ -2,58 +2,73 @@ package main.java.app.util;
 
 import javax.swing.ImageIcon;
 import java.io.File;
-import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
 
 public class AssetLoader {
+    private static final Map<String, ImageIcon> imageCache = new HashMap<>();
 
-    // --- LOGIC PENCARIAN FILE YANG LEBIH KUAT ---
-    private static URL getResource(String type, String filename) {
-        String pathInsideJar = "/assets/" + type + "/" + filename;
+    public static ImageIcon loadImage(String dbPath) {
+        if (dbPath == null || dbPath.isEmpty()) return null;
         
-        // CARA 1: Coba Load via Classpath (Standard Java)
-        URL url = AssetLoader.class.getResource(pathInsideJar);
+        // Bersihkan path: Jika database menyimpan "images/file.jpg", kita ambil "file.jpg" saja
+        // karena loader kita sudah pintar mencari di folder images.
+        String cleanName = new File(dbPath).getName(); 
         
-        // Jika ketemu, langsung kembalikan
-        if (url != null) {
-            return url;
+        if (imageCache.containsKey(cleanName)) {
+            return imageCache.get(cleanName);
         }
 
-        // CARA 2: Jika GAGAL, Coba cari manual di folder Project (Fallback)
-        // Kita cek beberapa kemungkinan lokasi folder "assets"
+        URL url = getResource("images", cleanName);
+        
+        // Fallback ke gambar default jika tidak ditemukan
+        if (url == null) {
+            // System.err.println("⚠️ Asset tidak ditemukan: " + cleanName + " (Menggunakan Fallback)");
+            if (imageCache.containsKey("landing-hero.jpg")) {
+                return imageCache.get("landing-hero.jpg");
+            }
+            url = getResource("images", "landing-hero.jpg"); 
+        }
+
+        if (url != null) {
+            ImageIcon icon = new ImageIcon(url);
+            imageCache.put(cleanName, icon);
+            return icon;
+        }
+        
+        return null; 
+    }
+
+    public static URL getAudioURL(String dbPath) {
+        if (dbPath == null || dbPath.isEmpty()) return null;
+        String cleanName = new File(dbPath).getName(); // Ambil nama file saja
+        return getResource("audio", cleanName);
+    }
+
+    private static URL getResource(String type, String filename) {
+        // Coba berbagai kemungkinan path (Relatif & Absolute)
         String[] possiblePaths = {
-            "src/main/resources/assets/" + type + "/" + filename,  // Struktur Maven
-            "src/assets/" + type + "/" + filename,                 // Struktur Standard
-            "assets/" + type + "/" + filename                      // Struktur Root
+            "/assets/" + type + "/" + filename,
+            "src/main/resources/assets/" + type + "/" + filename,
+            "bin/main/resources/assets/" + type + "/" + filename,
+            "src/assets/" + type + "/" + filename
         };
 
-        for (String path : possiblePaths) {
-            File f = new File(path);
-            if (f.exists()) {
-                try {
-                    // System.out.println("File ditemukan via Path Manual: " + path); // Debug
-                    return f.toURI().toURL();
-                } catch (MalformedURLException e) {
-                    e.printStackTrace();
+        for (String pathStr : possiblePaths) {
+            // Cek Classpath dulu (Paling Benar)
+            if (pathStr.startsWith("/")) {
+                URL url = AssetLoader.class.getResource(pathStr);
+                if (url != null) return url;
+            } 
+            // Cek File System (Untuk Development/VS Code)
+            else {
+                File f = new File(pathStr);
+                if (f.exists()) {
+                    try { return f.toURI().toURL(); } catch (Exception e) {}
                 }
             }
         }
-
-        // Jika masih tidak ketemu juga
-        System.err.println("❌ ERROR FATAL: File tidak ditemukan di manapun -> " + filename);
-        System.err.println("   Cek apakah file ada di folder: src/main/resources/assets/" + type + "/");
         return null;
-    }
-
-    // --- PUBLIC METHODS ---
-
-    public static ImageIcon loadImage(String filename) {
-        URL url = getResource("images", filename);
-        if (url == null) return null;
-        return new ImageIcon(url);
-    }
-
-    public static URL getAudioURL(String filename) {
-        return getResource("audio", filename);
     }
 }

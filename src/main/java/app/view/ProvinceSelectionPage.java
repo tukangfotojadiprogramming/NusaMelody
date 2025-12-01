@@ -1,96 +1,109 @@
 package main.java.app.view;
 
+import main.java.app.util.AssetLoader;
 import main.java.app.util.UIStyle;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ProvinceSelectionPage extends JPanel {
     private JPanel gridPanel;
-    private JButton btnBack; // Tombol Kembali
+    private JButton btnBack;
+    
+    // DAFTAR TOMBOL (SOLUSI AGAR KLIK SELALU BERFUNGSI)
+    private List<JButton> actionButtons = new ArrayList<>();
 
     public ProvinceSelectionPage() {
         setLayout(new BorderLayout());
-        setBackground(UIStyle.COLOR_BG);
-
-        // Header Panel dengan Tombol Kembali
-        JPanel header = new JPanel(new BorderLayout());
-        header.setBackground(UIStyle.COLOR_BG);
+        JPanel mainPanel = UIStyle.createBackgroundPanel();
         
-        btnBack = new JButton("← Kembali");
-        UIStyle.applyModernButton(btnBack);
-        btnBack.setBackground(Color.GRAY);
-        
-        JPanel btnContainer = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        btnContainer.setOpaque(false);
-        btnContainer.add(btnBack);
+        // Header
+        btnBack = UIStyle.createWoodenButton("Kembali");
+        btnBack.setPreferredSize(new Dimension(120, 40));
+        mainPanel.add(UIStyle.createHeader("Pilih Daerah Nusantara", btnBack), BorderLayout.NORTH);
 
-        header.add(btnContainer, BorderLayout.WEST);
-        header.add(UIStyle.createHeader("Pilih Daerah Nusantara"), BorderLayout.CENTER);
-        header.add(Box.createHorizontalStrut(100), BorderLayout.EAST); // Spacer
+        // Grid
+        gridPanel = new JPanel(new GridLayout(0, 3, 30, 30));
+        gridPanel.setOpaque(false);
+        gridPanel.setBorder(BorderFactory.createEmptyBorder(20, 50, 50, 50));
 
-        add(header, BorderLayout.NORTH);
-
-        gridPanel = new JPanel(new GridLayout(0, 3, 20, 20));
-        gridPanel.setBackground(UIStyle.COLOR_BG);
-        gridPanel.setBorder(BorderFactory.createEmptyBorder(20, 50, 20, 50));
-
-        // DATA SESUAI FILE songs (1).sql
-        // Pastikan string nama provinsi SAMA PERSIS dengan di database
-        addProvinceCard("Bengkulu", "Bunga Rafflesia");
-        addProvinceCard("Jawa Tengah", "Borobudur & Batik");
-        addProvinceCard("Jawa Barat", "Angklung & Tari Jaipong");
-        addProvinceCard("DKI Jakarta", "Ondel-Ondel & Monas");
-        addProvinceCard("Kalimantan Selatan", "Pasar Terapung");
-        addProvinceCard("Maluku", "Kepulauan Rempah");
-        addProvinceCard("Papua", "Cendrawasih & Raja Ampat");
-        addProvinceCard("Sumatra Barat", "Jam Gadang & Rendang");
-        addProvinceCard("Nusa Tenggara Barat", "Pulau Komodo & Mandalika");
+        // Load Data
+        addCard("Bengkulu", "Terkenal dengan Bunga Rafflesia.");
+        addCard("Jawa Tengah", "Dikenal dengan Candi Borobudur.");
+        addCard("Jawa Barat", "Rumah bagi Angklung.");
+        addCard("DKI Jakarta", "Ikon budaya Betawi & Ondel-Ondel.");
+        addCard("Kalimantan Selatan", "Identik dengan Pasar Terapung.");
+        addCard("Maluku", "Dijuluki Kepulauan Rempah.");
+        addCard("Papua", "Dikenal dengan Cenderawasih.");
+        addCard("Sumatra Barat", "Terkenal dengan Jam Gadang.");
+        addCard("Nusa Tenggara Barat", "Dikenal dengan Pulau Komodo.");
 
         JScrollPane scroll = new JScrollPane(gridPanel);
+        scroll.setOpaque(false);
+        scroll.getViewport().setOpaque(false);
         scroll.setBorder(null);
         scroll.getVerticalScrollBar().setUnitIncrement(16);
-        add(scroll, BorderLayout.CENTER);
+        
+        mainPanel.add(scroll, BorderLayout.CENTER);
+        add(mainPanel, BorderLayout.CENTER);
     }
 
-    private void addProvinceCard(String name, String desc) {
-        JPanel card = new JPanel(new BorderLayout());
-        card.setBackground(Color.WHITE);
-        card.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createLineBorder(UIStyle.COLOR_PRIMARY, 1, true),
-            BorderFactory.createEmptyBorder(15, 15, 15, 15)
-        ));
-        card.setPreferredSize(new Dimension(200, 150));
+    private void addCard(String name, String desc) {
+        // Panel Kartu
+        JPanel card = new JPanel(new BorderLayout()) {
+            @Override
+            protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                // Coba load texture kertas
+                ImageIcon paper = AssetLoader.loadImage("paper-texture.png");
+                if(paper != null) g.drawImage(paper.getImage(), 0, 0, getWidth(), getHeight(), null);
+                else { g.setColor(new Color(245, 245, 220)); g.fillRect(0,0,getWidth(),getHeight()); }
+                
+                // Border
+                Graphics2D g2 = (Graphics2D) g;
+                g2.setStroke(new BasicStroke(4));
+                g2.setColor(new Color(139, 69, 19));
+                g2.drawRect(0,0,getWidth(),getHeight());
+            }
+        };
+        card.setPreferredSize(new Dimension(300, 200));
+        card.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
 
-        JLabel title = new JLabel("<html><center>" + name + "</center></html>", SwingConstants.CENTER);
-        title.setFont(new Font("Serif", Font.BOLD, 20));
-        title.setForeground(UIStyle.COLOR_SIDEBAR);
+        JLabel title = new JLabel(name, SwingConstants.CENTER);
+        title.setFont(new Font("Serif", Font.BOLD, 24));
+        title.setForeground(new Color(101, 67, 33));
 
-        JLabel subtitle = new JLabel("<html><center>" + desc + "</center></html>", SwingConstants.CENTER);
-        subtitle.setFont(new Font("SansSerif", Font.PLAIN, 12));
-        subtitle.setForeground(Color.GRAY);
+        JTextArea description = new JTextArea(desc);
+        description.setWrapStyleWord(true);
+        description.setLineWrap(true);
+        description.setEditable(false);
+        description.setOpaque(false);
+        description.setFont(new Font("SansSerif", Font.PLAIN, 14));
+        description.setForeground(Color.BLACK);
 
-        JButton btnSelect = new JButton("Lihat Lagu");
-        UIStyle.applyModernButton(btnSelect);
-        // Simpan nama provinsi asli untuk query DB
-        btnSelect.putClientProperty("provinceName", name);
+        JButton btn = UIStyle.createWoodenButton("Lihat Lagu");
+        btn.putClientProperty("provinceName", name);
+        
+        // PENTING: Masukkan tombol ke daftar agar listener bisa dipasang dengan benar
+        actionButtons.add(btn);
 
         card.add(title, BorderLayout.NORTH);
-        card.add(subtitle, BorderLayout.CENTER);
-        card.add(btnSelect, BorderLayout.SOUTH);
+        card.add(description, BorderLayout.CENTER);
+        card.add(btn, BorderLayout.SOUTH);
 
         gridPanel.add(card);
     }
 
+    // METHOD INI YANG DIPERBAIKI
     public void setSelectionListener(ActionListener listener) {
-        for (Component c : gridPanel.getComponents()) {
-            if (c instanceof JPanel) {
-                JPanel card = (JPanel) c;
-                if(card.getComponentCount() >= 3) {
-                    JButton btn = (JButton) card.getComponent(2);
-                    btn.addActionListener(listener);
-                }
-            }
+        // Kita tidak lagi menebak posisi tombol, tapi langsung mengakses daftar tombol
+        for (JButton btn : actionButtons) {
+            // Hapus listener lama biar tidak dobel
+            for (ActionListener al : btn.getActionListeners()) btn.removeActionListener(al);
+            // Pasang listener baru
+            btn.addActionListener(listener);
         }
     }
     

@@ -39,19 +39,13 @@ public class QuizController {
         this.leaderboardRepo = lbRepo;
         this.player = new AudioPlayer();
 
-        // --- LISTENER TOMBOL ---
-        
-        // 1. Tombol di Menu Utama Kuis
+        // Action Buttons
         view.getStartButton().addActionListener(e -> startPreGameCountdown());
+        view.getReplayButton().addActionListener(e -> playSnippet());
         view.getBtnLeaderboard().addActionListener(e -> showLeaderboard());
         
-        // 2. Tombol di Dalam Game
-        view.getReplayButton().addActionListener(e -> playSnippet());
-        
-        // 3. Tombol Kembali di Leaderboard -> BALIK KE MENU KUIS (Bukan Beranda)
-        leaderboardView.getBtnBack().addActionListener(e -> {
-            view.showMenu();
-        });
+        // Tombol Back di Leaderboard
+        leaderboardView.getBtnBack().addActionListener(e -> view.showMenu());
     }
 
     public void setUser(String name, String email) {
@@ -59,32 +53,15 @@ public class QuizController {
         this.currentUserEmail = email;
     }
 
-    // Method untuk dipanggil Main saat navigasi sidebar dipencet
     public void abortGame() {
         if (isGameActive) {
             isGameActive = false;
             stopTimers();
             player.stop();
-            view.showMenu(); // Reset tampilan ke menu
+            view.showMenu();
+            System.out.println("Game dibatalkan.");
         }
     }
-
-    private void showLeaderboard() {
-        // Tampilkan loading atau langsung switch
-        view.showLeaderboardPanel();
-        
-        // Ambil data di background
-        ThreadManager.execute(() -> {
-            List<LeaderboardEntry> data = leaderboardRepo.getTopScores();
-            
-            // Update UI di thread Swing
-            SwingUtilities.invokeLater(() -> {
-                leaderboardView.setLeaderboardData(data);
-            });
-        });
-    }
-
-    // ... (Sisa logika game sama, tapi saya tulis ulang biar lengkap) ...
 
     private void startPreGameCountdown() {
         isGameActive = true;
@@ -151,6 +128,7 @@ public class QuizController {
 
         currentAnswer = sessionSongs.get(currentQuestionIndex);
         
+        // Opsi Jawaban
         List<RegionalSong> options = songRepo.getAllSongs();
         Collections.shuffle(options);
         options.removeIf(s -> s.getId() == currentAnswer.getId());
@@ -176,7 +154,11 @@ public class QuizController {
     private void playSnippet() {
         if (!isGameActive) return;
         player.stop();
-        player.loadAndPlay(currentAnswer.getAudioPath());
+        
+        // --- PERUBAHAN UTAMA DI SINI ---
+        // Memutar lagu dari posisi ACAK selama 5 detik
+        player.loadAndPlayRandom(currentAnswer.getAudioPath(), 5); 
+        // -------------------------------
         
         if(audioCutoffTimer != null) audioCutoffTimer.stop();
         audioCutoffTimer = new Timer(5000, e -> {
@@ -197,6 +179,7 @@ public class QuizController {
         if (selected.getId() == currentAnswer.getId()) {
             score += 10; 
         }
+        
         currentQuestionIndex++;
         loadQuestion();
     }
@@ -208,7 +191,10 @@ public class QuizController {
         
         if(globalTime > 0) score += globalTime; 
         
-        leaderboardRepo.saveScore(currentUserName, currentUserEmail, score);
+        // Simpan skor
+        if (leaderboardRepo != null) {
+            leaderboardRepo.saveScore(currentUserName, currentUserEmail, score);
+        }
         
         JOptionPane.showMessageDialog(view, message + "\nSkor Akhir Kamu: " + score);
         view.showMenu();
@@ -217,5 +203,15 @@ public class QuizController {
     private void stopTimers() {
         if (globalTimer != null) globalTimer.stop();
         if (audioCutoffTimer != null) audioCutoffTimer.stop();
+    }
+    
+    private void showLeaderboard() {
+        view.showLeaderboardPanel();
+        ThreadManager.execute(() -> {
+            List<LeaderboardEntry> data = leaderboardRepo.getTopScores();
+            SwingUtilities.invokeLater(() -> {
+                leaderboardView.setLeaderboardData(data);
+            });
+        });
     }
 }
