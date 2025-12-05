@@ -13,7 +13,6 @@ public abstract class MediaItem {
         this.thumbnailPath = thumbnailPath;
     }
 
-    // ABSTRACT METHOD: Wajib di-override oleh class turunannya
     public abstract String getMediaType();
 
     // GETTERS (Encapsulation)

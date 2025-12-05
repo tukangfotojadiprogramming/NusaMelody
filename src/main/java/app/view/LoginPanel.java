@@ -61,11 +61,11 @@ public class LoginPanel extends JPanel {
         icon.setForeground(PRIMARY);
         icon.setHorizontalAlignment(SwingConstants.CENTER);
         c.gridy = 0;
-        c.insets = new Insets(6, 0, 6, 0); // top/bottom kecil
+        c.insets = new Insets(6, 0, 6, 0); 
         card.add(icon, c);
 
         // Row 1: title
-        JLabel lblTitle = new JLabel("Kuis Lirik Nusantara");
+        JLabel lblTitle = new JLabel("Nusa Melody(Melodi Nusantara)");
         lblTitle.setFont(new Font("SansSerif", Font.BOLD, 20));
         lblTitle.setForeground(new Color(45, 40, 37));
         lblTitle.setHorizontalAlignment(SwingConstants.CENTER);

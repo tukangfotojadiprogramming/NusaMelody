@@ -14,13 +14,18 @@ public class Main {
     private static JFrame frame;
     private static JPanel mainWrapper;
     private static JPanel sidebar;
-    private static JPanel loginContainer;
+    private static JPanel loginContainer; // Sekarang akan menggunakan CardLayout
+    private static CardLayout loginCardLayout; // CardLayout untuk loginContainer
     private static CardLayout contentLayout;
     private static JPanel contentPanel;
     private static boolean isSidebarVisible = false;
 
     private static QuizController quizCtrl;
     private static SongController songCtrl;
+
+    // Nama kartu untuk CardLayout Login
+    private static final String LOGIN_VIEW = "LOGIN";
+    private static final String SIGNUP_VIEW = "SIGNUP";
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
@@ -36,17 +41,23 @@ public class Main {
             LoginPanel loginPage = new LoginPanel();
             SignupPanel signupPanel = new SignupPanel();
             
-            // Container Login dengan Background
-            loginContainer = new JPanel(new GridBagLayout()) {
+            // --- MODIFIKASI UTAMA DI SINI: MENGGANTI JDialog DENGAN CardLayout ---
+            loginCardLayout = new CardLayout();
+            // Container Login sekarang menggunakan CardLayout
+            loginContainer = new JPanel(loginCardLayout) {
+                // Background hanya diterapkan pada container, bukan pada panel di dalamnya
                 @Override
                 protected void paintComponent(Graphics g) {
                     super.paintComponent(g);
-                    g.setColor(UIStyle.COLOR_BG);
+                    g.setColor(UIStyle.COLOR_BG); 
                     g.fillRect(0, 0, getWidth(), getHeight());
                 }
             };
-            loginContainer.add(loginPage);
-
+            
+            // Tambahkan kedua panel ke loginContainer
+            loginContainer.add(loginPage, LOGIN_VIEW);
+            loginContainer.add(signupPanel, SIGNUP_VIEW);
+            
             // Login Success
             loginPage.setLoginListener(email -> {
                 initMainApp(email); 
@@ -55,27 +66,32 @@ public class Main {
                 frame.repaint();
             });
 
-            // Signup Dialog
+            // 1. NAVIGASI DARI LOGIN KE SIGNUP
             loginPage.getSignupButton().addActionListener(e -> {
-                JDialog d = new JDialog(frame, "Daftar Akun Baru", Dialog.ModalityType.APPLICATION_MODAL);
-                d.setContentPane(signupPanel);
-                d.setSize(450, 650);
-                d.setLocationRelativeTo(frame);
-                
-                signupPanel.setSignupListener(mail -> {
-                    d.dispose();
-                    JOptionPane.showMessageDialog(frame, "Akun berhasil dibuat! Silakan login.");
-                });
-                
-                signupPanel.getBackToLoginButton().addActionListener(ev -> d.dispose());
-                d.setVisible(true);
+                loginCardLayout.show(loginContainer, SIGNUP_VIEW);
+                frame.revalidate();
             });
+
+            // 2. NAVIGASI DARI SIGNUP KEMBALI KE LOGIN
+            signupPanel.getBackToLoginButton().addActionListener(e -> {
+                loginCardLayout.show(loginContainer, LOGIN_VIEW);
+                frame.revalidate();
+            });
+
+            // 3. SIGNUP SUKSES
+            signupPanel.setSignupListener((String mail) -> {
+                JOptionPane.showMessageDialog(frame, "Akun berhasil dibuat! Silakan login.");
+                loginCardLayout.show(loginContainer, LOGIN_VIEW); // Kembali ke tampilan login
+                frame.revalidate();
+            });
+            // ---------------------------------------------------------------------
 
             frame.setContentPane(loginContainer);
             frame.setVisible(true);
         });
     }
-
+    
+    // --- Bagian initMainApp tidak berubah ---
     private static void initMainApp(String userEmail) {
         String userName = userEmail.split("@")[0];
         
@@ -122,6 +138,7 @@ public class Main {
         contentLayout = new CardLayout();
         contentPanel = new JPanel(contentLayout);
         
+        // ... (inisialisasi Controller dan Repositori)
         SongRepository songRepo = new SongRepository();
         LeaderboardRepository lbRepo = new LeaderboardRepository();
 
@@ -160,9 +177,7 @@ public class Main {
         });
         landingPage.setNavAction("QUIZ", () -> switchView("QUIZ"));
 
-        // --- PERBAIKAN UTAMA DI SINI ---
         provincePage.setSelectionListener(e -> {
-            // Ambil tombol yang diklik secara langsung (Aman)
             JButton sourceBtn = (JButton) e.getSource();
             String provName = (String) sourceBtn.getClientProperty("provinceName");
             
@@ -172,8 +187,7 @@ public class Main {
                 switchView("CATALOG");
             }
         });
-        // -------------------------------
-
+        
         addSidebarBtn(sidebar, "🏠 Beranda", () -> switchView("LANDING"));
         addSidebarBtn(sidebar, "🗺️ Jelajah Peta", () -> switchView("PROVINCE"));
         addSidebarBtn(sidebar, "🎶 Semua Lagu", () -> {
